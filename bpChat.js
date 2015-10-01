@@ -141,7 +141,7 @@ function processMsgs(bot, msgs)
 		var newMsgs = [];
 		for(var i = lastID+1; i <= curID; i++)
 		{
-			console.log("[BP Message]", msgs[i]);
+			console.log("[BP Message]", msgs[i][0],msgs[i][2]);
 			newMsgs.push(msgs[i]);
 		}
 		newMessages(newMsgs, bot);
@@ -155,7 +155,7 @@ function newMessages(msgs, bot)
 {
 	var usrs = users.get();
 	Object.keys(usrs).forEach(function(key){
-		if(usrs[key])
+		if(usrs[key][0])
 			sendNewMessages(msgs, 0, key, bot);
 	});
 }
@@ -175,6 +175,41 @@ function sendMsg(name, msg)
 {
 	//send message to bp chat
 	//wip
+	//console.log("sendMsg(",name,msg,")");
+	
+	var options = {
+		host: HOST,
+		path: SEND_MESSAGE_PATH,
+		method: 'POST',
+		headers: {
+		'Cookie': cookies,
+		'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	};
+
+	var req = https.request(options, function(res) {
+	  /*logResponse(res, function(data){
+		var json_data = JSON.parse(data);
+		console.log("Done");
+	  });*/
+		/*var data = "";
+		res.on('data', function (chunk) {
+	        //console.log('BODY: ' + chunk);
+			data += chunk;
+	    });
+	    res.on('end', function() {
+			data = JSON.parse(data);
+		});*/
+	});
+
+	req.on('error', function(e) {
+	  console.error(e);
+	});
+	
+	req.write("body="+encodeURIComponent(name + ": " + msg));
+	
+	req.end();
+	//console.log("Sending msg","body="+encodeURIComponent(name + ": " + msg));
 }
 
 

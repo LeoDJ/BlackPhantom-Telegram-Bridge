@@ -1,8 +1,10 @@
+"use strict";
 var bot = require('./bot.js');
 var bpBot = require('./bpBotHandler.js');
 var bpChat = require('./bpChat.js');
 var users = require('./users.js');
 var config = require('./config.js');
+
 
 
 //console.log(users.getUsers());
@@ -12,6 +14,6 @@ var config = require('./config.js');
 
 var myBot = new bot.Bot(config.auth_token, bpBot.bpBotHandler);
 var myBpChat = new bpChat.login(config.bpUser, config.bpPass, 2500, myBot);
-
+//myBot.api.sendMessage(20676519, "starting");
 console.log("Blackphantom Telegram Bot starting...");
 

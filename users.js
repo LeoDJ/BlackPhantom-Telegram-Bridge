@@ -2,10 +2,10 @@ var fs = require('fs');
 var usersFile = 'users.json';
 var users = {};
 
-function add(uid, trusted)
+function add(uid, trusted, name)
 {
 	users = get();
-	users[uid] = trusted;
+	users[uid] = [trusted, name];
 	saveUsers(users);
 }
 
@@ -36,8 +36,49 @@ function get()
 	return JSON.parse(file);
 }
 
+function isTrusted(id)
+{
+	try
+	{
+		return get()[id][0];
+	}
+	catch(e)
+	{
+		return false;
+	}
+}
+
+function getName(id)
+{
+	try
+	{
+		return get()[id][1];
+	}
+	catch(e)
+	{
+		console.warn("Username of",id,"not found")
+		return "";
+	}
+}
+
+function setName(id, name)
+{
+	var usrs = get();
+	try
+	{
+		usrs[id][1] = name;
+	}
+	catch(e)
+	{
+		console.warn("User",id,"not found");
+	}
+	saveUsers(usrs);
+}
 
 
 
 exports.add = add;
 exports.get = get;
+exports.isTrusted = isTrusted;
+exports.getName = getName;
+exports.setName = setName;

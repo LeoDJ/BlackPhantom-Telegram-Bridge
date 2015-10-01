@@ -142,6 +142,13 @@ function processMsgs(bot, msgs)
 		for(var i = lastID+1; i <= curID; i++)
 		{
 			console.log("[BP Message]", msgs[i][0],msgs[i][2]);
+			if(msgs[i][0] === "BOT")
+			{
+				console.log("Detected 'BOT'");
+				msgs[i][0] = msgs[i][2].substr(0, msgs[i][2].indexOf(":")) + " [via BOT]";
+				msgs[i][2] = msgs[i][2].substr(msgs[i][2].indexOf(":")+2);
+			}
+			
 			newMsgs.push(msgs[i]);
 		}
 		newMessages(newMsgs, bot);
@@ -164,6 +171,11 @@ function sendNewMessages(msgs, id, userID, bot)
 {
 	if(id == msgs.length) return;
 	var msg = msgs[id][0] + ":\n"+msgs[id][2];
+	if(msgs[id][0] === users.getName(userID) + " [via BOT]")
+	{
+		sendNewMessages(msgs, id+1, userID, bot);
+		return;
+	}
 	bot.api.sendMessage(userID, msg).then(function(){ 
 		sendNewMessages(msgs, id+1, userID, bot);
 	});

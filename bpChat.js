@@ -5,7 +5,8 @@ var lastIDfile = 'lastID.txt';
 
 var HOST = "chat.blackphantom.de" /*"localhost"*/; // TEST
 var LOGIN_PATH =        "/api/authentication.php";
-var GET_MESSAGES_PATH = "/api/loadLastMessages.php";
+var GET_LAST_MESSAGES_PATH = "/api/loadLastMessages.php";
+var GET_MESSAGES_PATH = "/api/loadMessages.php";
 var SEND_MESSAGE_PATH = "/api/sendMessage.php";
 var GET_USERS_PATH =    "/api/onlineusers.php";
 
@@ -70,10 +71,9 @@ function getMsgs(bot, callback)
 	};
 
 	var req = https.request(options, function(res) {
-	  /*logResponse(res, function(data){
-		var json_data = JSON.parse(data);
-		console.log("Done");
-	  });*/
+	    /*logResponse(res, function(data){
+			console.log("Done");
+	  	});*/
 		var data = "";
 		res.on('data', function (chunk) {
 	        //console.log('BODY: ' + chunk);
@@ -88,7 +88,9 @@ function getMsgs(bot, callback)
 	  console.error(e);
 	});
 	
-	req.write("limit=200");
+	//req.write("limit=200");
+	lastID = getLastID();
+	req.write("lastID="+lastID);
 	req.end();
 }
 
@@ -133,26 +135,32 @@ function saveLastID(id)
 
 function processMsgs(bot, msgs)
 {
-	var curID = parseInt(Object.keys(msgs)[0])+199;
-	var lastID = getLastID();
-
-	if (lastID < curID)
+	if(msgs != null)
 	{
-		var newMsgs = [];
-		for(var i = lastID+1; i <= curID; i++)
+		msgCount = Object.keys(msgs).length;
+		//console.log("Length:",msgCount);
+		var curID = parseInt(Object.keys(msgs)[msgCount-1]);
+		//console.log("CurID:::: "+curID);
+		var lastID = getLastID();
+	
+		if (lastID < curID)
 		{
-			console.log("[BP Message]", msgs[i][0],msgs[i][2]);
-			if(msgs[i][0] === "BOT")
+			var newMsgs = [];
+			for(var i = lastID+1; i <= curID; i++)
 			{
-				console.log("Detected 'BOT'");
-				msgs[i][0] = msgs[i][2].substr(0, msgs[i][2].indexOf(":")) + " [via BOT]";
-				msgs[i][2] = msgs[i][2].substr(msgs[i][2].indexOf(":")+2);
+				console.log("[BP Message]", msgs[i][0],msgs[i][2]);
+				if(msgs[i][0] === "BOT")
+				{
+					console.log("Detected 'BOT'");
+					msgs[i][0] = msgs[i][2].substr(0, msgs[i][2].indexOf(":")) + " [via BOT]";
+					msgs[i][2] = msgs[i][2].substr(msgs[i][2].indexOf(":")+2);
+				}
+				
+				newMsgs.push(msgs[i]);
 			}
-			
-			newMsgs.push(msgs[i]);
+			newMessages(newMsgs, bot);
+			saveLastID(curID);
 		}
-		newMessages(newMsgs, bot);
-		saveLastID(curID);
 	}
 	
 }

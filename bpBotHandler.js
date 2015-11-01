@@ -26,10 +26,23 @@ function bpBotHandler(bot, msg)
 		users.setName(uid, cmd[1]);
 		bot.sendMessage(uid, "Name geändert in \"" + cmd[1] + "\".")
 	}
+	else if(cmd[0] == '/login')
+	{
+		try
+		{
+			users.setBpLogin(uid, cmd[1], cmd[2]);
+			bot.sendMessage(uid, "Login-Daten gespeichert.\nBitte lösche die obige Nachricht, damit niemand einfach deine Daten lesen kann.")
+		}
+		catch(e)
+		{
+			bot.sendMessage(uid, "Tipp gefälligst richtig! (/login <name> <pass>)");
+			console.log(e);
+		}
+	}
 	else if (users.isTrusted(msg.from.id))
 	{
 		var name = users.getName(uid);
-		console.log("[Bot > BP Chat]",name, msg.text);
+		//console.log("[Bot > BP Chat]",name, msg.text);
 		bpChat.sendMsg(name, msg.text);
 
 	}

@@ -2,10 +2,11 @@ var fs = require('fs');
 var usersFile = 'users.json';
 var users = {};
 
+
 function add(uid, trusted, name)
 {
 	users = get();
-	users[uid] = [trusted, name];
+	users[uid] = {"trusted": trusted, "name": name};
 	saveUsers(users);
 }
 
@@ -40,7 +41,7 @@ function isTrusted(id)
 {
 	try
 	{
-		return get()[id][0];
+		return get()[id]["trusted"];
 	}
 	catch(e)
 	{
@@ -52,7 +53,7 @@ function getName(id)
 {
 	try
 	{
-		return get()[id][1];
+		return get()[id]["name"];
 	}
 	catch(e)
 	{
@@ -66,7 +67,7 @@ function setName(id, name)
 	var usrs = get();
 	try
 	{
-		usrs[id][1] = name;
+		usrs[id]["name"] = name;
 	}
 	catch(e)
 	{
@@ -75,6 +76,39 @@ function setName(id, name)
 	saveUsers(usrs);
 }
 
+function setBpLogin(id, bpName, bpPass)
+{
+	var usrs = get();
+	try
+	{
+		usrs[id]["bpName"] = bpName;
+		usrs[id]["bpPass"] = new Buffer(bpPass).toString('base64');
+	}
+	catch(e)
+	{
+		console.warn("User",id,"not found","("+e+")");
+		throw new Error(e);
+	}
+	saveUsers(usrs);
+}
+
+function getBpLogin(id)
+{
+	var usrs = get();
+	var login = [];
+	try
+	{
+		login.push(usrs[id]["bpName"]);
+		login.push(new Buffer(usrs[id]["bpPass"], 'base64').toString('utf-8'));
+		
+	}
+	catch(e)
+	{
+		console.warn("User",id,"has no BP login");
+		return null;
+	}
+	return login;
+}
 
 
 exports.add = add;
@@ -82,3 +116,5 @@ exports.get = get;
 exports.isTrusted = isTrusted;
 exports.getName = getName;
 exports.setName = setName;
+exports.setBpLogin = setBpLogin;
+exports.getBpLogin = getBpLogin;

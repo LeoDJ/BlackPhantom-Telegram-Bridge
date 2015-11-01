@@ -1,6 +1,7 @@
 node_modules
 config.js
 users.json
+.dropbox
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

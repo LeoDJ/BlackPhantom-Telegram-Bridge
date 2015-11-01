@@ -3,7 +3,7 @@ var users = require('./users.js');
 var fs = require('fs');
 var lastIDfile = 'lastID.txt';
 
-var HOST = "chat.blackphantom.de" /*"localhost"*/; // TEST
+var HOST = "chat.nerdmind.de" /*"localhost"*/; // TEST
 var LOGIN_PATH =        "/api/authentication.php";
 var GET_LAST_MESSAGES_PATH = "/api/loadLastMessages.php";
 var GET_MESSAGES_PATH = "/api/loadMessages.php";
@@ -11,12 +11,10 @@ var SEND_MESSAGE_PATH = "/api/sendMessage.php";
 var GET_USERS_PATH =    "/api/onlineusers.php";
 
 var cookies = "";
-var bot;
 var lastID = 0;
 
-function login(user, pass, refreshInterval, myBot)
+function login(user, pass, refreshInterval, bot)
 {
-	bot = myBot;
 	
 
 	var data = 'username=' + user + '&password=' + pass;
@@ -151,7 +149,7 @@ function processMsgs(bot, msgs)
 				console.log("[BP Message]", msgs[i][0],msgs[i][2]);
 				if(msgs[i][0] === "BOT")
 				{
-					console.log("Detected 'BOT'");
+					//console.log("Detected 'BOT'");
 					msgs[i][0] = msgs[i][2].substr(0, msgs[i][2].indexOf(":")) + " [via BOT]";
 					msgs[i][2] = msgs[i][2].substr(msgs[i][2].indexOf(":")+2);
 				}
@@ -170,7 +168,7 @@ function newMessages(msgs, bot)
 {
 	var usrs = users.get();
 	Object.keys(usrs).forEach(function(key){
-		if(usrs[key][0])
+		if(usrs[key]["trusted"])
 			sendNewMessages(msgs, 0, key, bot);
 	});
 }
@@ -232,7 +230,10 @@ function sendMsg(name, msg)
 	//console.log("Sending msg","body="+encodeURIComponent(name + ": " + msg));
 }
 
-
+function testLogin(user, pass)
+{
+	//todo
+}
 
 exports.login = login;
 exports.sendMsg = sendMsg;
